@@ -1,6 +1,8 @@
 # svgtree
 
-Render a git-like tree as SVG from a text file
+> Render a git-like tree as SVG from a text file
+
+![sample](sample/fix.svg)
 
 # Usage
 
