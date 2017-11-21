@@ -15,6 +15,7 @@ my $stroke = 2;  # path stroke
 my $radius = 6;  # circle radius
 my $hspace = 20; # horizontal spacing
 my $vspace = 40; # vertical spacing
+my $commit = 0;  # should commits ref be displayed
 
 # inner variables
 my %branch = (
@@ -24,6 +25,7 @@ my %branch = (
 );
 my $maxsteps = 0;
 my $dataoffset = 0;
+my $refsroom = 0;
 my %svg = (
   size => {
     width => 0,
@@ -34,12 +36,13 @@ my %svg = (
 
 # parse command line args
 GetOptions(
-  "i|input=s"  => \$input,
+  "d|debug"    => \$debug,
   "h|hspace=i" => \$hspace,
+  "i|input=s"  => \$input,
+  "l|labels"   => \$commit,
   "o|output=s" => \$output,
   "r|radius=i" => \$radius,
   "s|stroke=i" => \$stroke,
-  "d|debug"    => \$debug,
   "v|vspace=i" => \$vspace
 ) or die("Oh no, something wrong happened with command line args");
 
@@ -86,8 +89,12 @@ foreach (my $i=0; $i<@{$branch{'name'}}; $i++) {
     $dataoffset = (length($branch{'name'}[$i]) +1)*10;
   }
 }
+# if use wants to see commit refs...
+if ($commit) {
+  $refsroom = 10;
+}
 $svg{'size'}{'width'} = ($maxsteps * $hspace) + $radius*2 + $dataoffset;
-$svg{'size'}{'height'} = (@{$branch{'data'}} - 1) * $vspace + $radius*2 + $stroke*2;
+$svg{'size'}{'height'} = (@{$branch{'data'}} - 1) * $vspace + $radius*2 + $stroke*2 + $refsroom;
 verbose("SVG size: $svg{'size'}{'width'}x$svg{'size'}{'height'}");
 
 # generate SVG elements by looping thru branches
@@ -100,6 +107,7 @@ foreach (my $i=0; $i<@{$branch{'data'}}; $i++) {
   my $labels     = "";
   my $started   = 0;
   my $step      = 0;
+  my $commits   = 0;
   my $offset_y = $i * $vspace + $radius + $stroke;
   my $text_x = $stroke * 2;
   my $text_y = $offset_y + $radius;
@@ -112,6 +120,12 @@ foreach (my $i=0; $i<@{$branch{'data'}}; $i++) {
       if ($started) {
         my $x2 = $x - $hspace;
         $segments .= "<line x1=\"$x2\" y1=\"$offset_y\" x2=\"$x\" y2=\"$offset_y\" stroke=\"$branch{'color'}[$i]\" stroke-width=\"$stroke\" />";
+      }
+      if ($commit) {
+        my $ref = sprintf "%1d%02d", $i+1, ++$commits;
+        my $ref_y = $offset_y + $radius + $refsroom;
+        verbose("adding commit ref: $ref");
+        $labels .= "<text x=\"$x\" y=\"$ref_y\" text-anchor=\"middle\" font-family=\"Verdana\" font-size=\"8\">$ref</text>";
       }
       $started = 1;
     } elsif (m/\-/) {
@@ -129,6 +143,7 @@ foreach (my $i=0; $i<@{$branch{'data'}}; $i++) {
         $segments .= "<line x1=\"$x1\" y1=\"$offset_y\" x2=\"$x2\" y2=\"$offset_y\" stroke=\"$branch{'color'}[$i]\" stroke-width=\"$stroke\" />";
         $color = $branch{'color'}[$1];
       }
+      # two arcs with control points
       my $start_x = $dataoffset + ($step-1) * $hspace + $radius;
       my $start_y = $1 * $vspace + $radius + $stroke;
       my $arc_1_start_x = $dataoffset + $step * $hspace - $radius*2;

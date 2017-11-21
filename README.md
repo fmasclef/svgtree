@@ -4,7 +4,20 @@ Render a git-like tree as SVG from a text file
 
 # Usage
 
-    ./svgtree.pl -i <.tree file> -o <.svg file>
+    ./svgtree.pl --input <.tree file> --output <.svg file>
+
+Parameters `-i|--input` and `-o|--output` are mandatory. All others are optionals. None are excluding. Please refer to the following table for supported paramters:
+
+|short|long|description|
+|---|---|---|
+|d|debug|show debug messages|
+|h|hspace|horizontal spacing between steps|
+|i|input|input file with full path|
+|l|labels|add labels for steps references|
+|o|output|output file with full path (will be overwritted)|
+|r|radius|bubble radius|
+|s|stroke|line width|
+|v|vspace|vertical spacing between branches|
 
 # .tree file format
 
