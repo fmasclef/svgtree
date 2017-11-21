@@ -1,0 +1,12 @@
+# this is a sample `fix` tree
+>fix tree
+>this generate a simple svg sample
+branch.0.name fix/alice
+branch.0.color #0000dd
+branch.1.name master
+branch.1.color #000000
+branch.2.name fix/bob
+branch.2.color #dd0000
+  1.-         1.
+..-..0.--.2...-.
+       1..
